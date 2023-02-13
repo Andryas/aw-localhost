@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  # aw_mysql:
+  #   image: arm64v8/mysql:oracle
+  #   command: --default-authentication-plugin=mysql_native_password
+  #   restart: always
+  #   container_name: aw_mysql
+  #   volumes:
+  #     - ~/Documents/mysql:/var/lib/mysql
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - aw_network
+  #   environment:
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #   env_file:
+  #     - .env
+
+  aw_mongo:
+    image: 'mongo:5.0.0'
+    container_name: 'aw_mongo'
+    volumes: 
+      - ~/Documents/mongo:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - aw_network
+    restart: always
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: $MONGO_INITDB_ROOT_USERNAME
+        MONGO_INITDB_ROOT_PASSWORD: $MONGO_INITDB_ROOT_PASSWORD
+    env_file:
+      - .env
+
+  rabbitmq3:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.8-management-alpine
+    volumes: 
+      - '~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/mnesia/'
+    networks:
+      - aw_network
+    restart: always
+    environment:
+        RABBITMQ_DEFAULT_USER: $RABBITMQ_USER
+        RABBITMQ_DEFAULT_PASS: $RABBITMQ_PASS
+    env_file:
+      - .env
+    ports:
+        # AMQP protocol port
+        - '5672:5672'
+        # HTTP management UI
+        - '15672:15672'
+  # splash:
+  #   image: scrapinghub/splash
+  #   platform: linux/amd64
+  #   networks:
+  #     - aw_network
+  #   ports:
+  #     - 8050:8050
+  #   expose:
+  #     - 8050
+networks:
+  aw_network:
+    name: aw_network
